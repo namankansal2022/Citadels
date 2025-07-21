@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Player.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Scaffold-6</a> &gt; <a href="index.source.html" class="el_package">citadels</a> &gt; <span class="el_source">Player.java</span></div><h1>Player.java</h1><pre class="source lang-java linenums">// File: src/main/java/citadels/Player.java
+package citadels;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+/**
+ * Represents a player in the Citadels game, encapsulating identity, resources,
+ * hand of cards, built city, and selected character.
+ */
+public class Player {
+    // Unique identifier for the player
+    private int id;
+    // Indicates if the player is human or AI-controlled
+    private boolean isHuman;
+    // Amount of gold the player currently holds
+    private int gold;
+    // List of district cards in the player's hand
+    private List&lt;District&gt; hand;
+    // List of district cards the player has built in their city
+    private List&lt;District&gt; city;
+    // ID of the character selected for the current round
+    private int character;
+
+    /**
+     * Constructs a new player with the specified ID and type.
+     *
+     * @param id      unique identifier of the player
+     * @param isHuman true if the player is controlled by a human, false for CPU
+     */
+<span class="fc" id="L35">    public Player(int id, boolean isHuman) {</span>
+<span class="fc" id="L36">        this.id = id;</span>
+<span class="fc" id="L37">        this.isHuman = isHuman;</span>
+<span class="fc" id="L38">        this.gold = 0;</span>
+<span class="fc" id="L39">        this.hand = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L40">        this.city = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L41">        this.character = 0;</span>
+<span class="fc" id="L42">    }</span>
+
+    /**
+     * Returns the player's unique identifier.
+     *
+     * @return player ID
+     */
+    public int getId() {
+<span class="fc" id="L50">        return id;</span>
+    }
+
+    /**
+     * Indicates whether this player is controlled by a human.
+     *
+     * @return true if human player, false if CPU
+     */
+    public boolean isHuman() {
+<span class="fc" id="L59">        return isHuman;</span>
+    }
+
+    /**
+     * Returns the amount of gold currently held by the player.
+     *
+     * @return current gold count
+     */
+    public int getGold() {
+<span class="fc" id="L68">        return gold;</span>
+    }
+
+    /**
+     * Returns the list of district cards in the player's hand.
+     *
+     * @return list of hand districts
+     */
+    public List&lt;District&gt; getHand() {
+<span class="fc" id="L77">        return hand;</span>
+    }
+
+    /**
+     * Returns the list of district cards in the player's city.
+     *
+     * @return list of built city districts
+     */
+    public List&lt;District&gt; getCity() {
+<span class="fc" id="L86">        return city;</span>
+    }
+
+    /**
+     * Returns the character ID selected by the player for the current round.
+     *
+     * @return character ID
+     */
+    public int getCharacter() {
+<span class="fc" id="L95">        return character;</span>
+    }
+
+    /**
+     * Sets the character ID for the current round.
+     *
+     * @param character character ID to assign
+     */
+    public void setCharacter(int character) {
+<span class="fc" id="L104">        this.character = character;</span>
+<span class="fc" id="L105">    }</span>
+
+    /**
+     * Adds the specified amount of gold to the player's resources.
+     *
+     * @param amt amount of gold to add
+     */
+    public void addGold(int amt) {
+<span class="fc" id="L113">        gold += amt;</span>
+<span class="fc" id="L114">    }</span>
+
+    /**
+     * Attempts to spend the specified amount of gold.
+     *
+     * @param amt amount of gold to spend
+     * @return true if the player had sufficient gold (and it was deducted),
+     *         false otherwise
+     */
+    public boolean spendGold(int amt) {
+<span class="fc bfc" id="L124" title="All 2 branches covered.">        if (amt &gt; gold) {</span>
+<span class="fc" id="L125">            return false;</span>
+        }
+<span class="fc" id="L127">        gold -= amt;</span>
+<span class="fc" id="L128">        return true;</span>
+    }
+
+    /**
+     * Adds a district card to the player's hand.
+     *
+     * @param d district to add
+     */
+    public void addCardToHand(District d) {
+<span class="fc" id="L137">        hand.add(d);</span>
+<span class="fc" id="L138">    }</span>
+
+    /**
+     * Checks whether the player has already built a district with the given name.
+     *
+     * @param name name of the district to check
+     * @return true if a built district matches the name (case-insensitive)
+     */
+    public boolean hasBuilt(String name) {
+<span class="fc" id="L147">        return city.stream()</span>
+<span class="fc" id="L148">                .anyMatch(d -&gt; d.getName().equalsIgnoreCase(name));</span>
+    }
+
+    /**
+     * Computes this player's final score at game end.
+     *
+     * @param firstCompleter true if this player was first to build ≥8 districts
+     * @param completed      true if this player built ≥8 districts
+     * @return total points based on district costs, color diversity bonus,
+     *         completion bonus, and unique district bonuses
+     */
+    public int calculateScore(boolean firstCompleter, boolean completed) {
+<span class="fc" id="L160">        int score = 0;</span>
+<span class="fc" id="L161">        Set&lt;String&gt; colorsSeen = new HashSet&lt;&gt;();</span>
+
+        // Add base cost and any bonus points from each district
+<span class="fc bfc" id="L164" title="All 2 branches covered.">        for (District d : city) {</span>
+<span class="fc" id="L165">            score += d.getCost();</span>
+<span class="fc" id="L166">            colorsSeen.add(d.getColor().toLowerCase());</span>
+<span class="fc" id="L167">            score += d.getPointBonus();</span>
+<span class="fc" id="L168">        }</span>
+
+        // Bonus for having all five district colors
+<span class="fc bfc" id="L171" title="All 2 branches covered.">        if (colorsSeen.containsAll(</span>
+<span class="fc" id="L172">                Arrays.asList(&quot;yellow&quot;, &quot;blue&quot;, &quot;green&quot;, &quot;red&quot;, &quot;purple&quot;))) {</span>
+<span class="fc" id="L173">            score += 3;</span>
+        }
+
+        // Bonus for completing the city (8+ districts)
+<span class="fc bfc" id="L177" title="All 2 branches covered.">        if (completed) {</span>
+<span class="fc bfc" id="L178" title="All 2 branches covered.">            score += (firstCompleter ? 4 : 2);</span>
+        }
+
+<span class="fc" id="L181">        return score;</span>
+    }
+
+    /**
+     * Returns a human-readable summary of the player's status.
+     *
+     * @return string summarizing hand size, gold, and built city
+     */
+    @Override
+    public String toString() {
+<span class="fc bfc" id="L191" title="All 2 branches covered.">        String cityStr = city.isEmpty()</span>
+                ? &quot;&quot;
+<span class="fc" id="L193">                : city.stream()</span>
+<span class="fc" id="L194">                .map(District::displayShort)</span>
+<span class="fc" id="L195">                .collect(Collectors.joining(&quot;, &quot;));</span>
+<span class="fc bfc" id="L196" title="All 2 branches covered.">        return &quot;Player &quot; + id</span>
+                + (isHuman ? &quot; (you)&quot; : &quot;&quot;)
+<span class="fc" id="L198">                + &quot;: cards=&quot; + hand.size()</span>
+                + &quot; gold=&quot; + gold
+                + &quot; city=&quot; + cityStr;
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>
